@@ -3,7 +3,7 @@
 **Course:** USI · Master in Finance Y1 · Programming in Finance & Economics II
 **Authors:** Andrea Cammarano, Giacomo Lanni, Edoardo Praderio (+ AI Associate)
 **Status:** v2.0 — supersedes the v1 slides dated April 2026
-**Repository:** https://github.com/edoardopraderio23/CRYPTO-ABRITRAGE-TRADING-BOT
+**Repository:** https://github.com/edoardopraderio23/CRYPTO-ARBITRAGE-TRADING-BOT
 
 ---
 
