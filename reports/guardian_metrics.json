@@ -1,0 +1,22 @@
+{
+  "test_auc": 0.6144948632826819,
+  "test_avg_precision": 0.2072817024034871,
+  "test_precision": 0.125,
+  "test_recall": 0.0072992700729927005,
+  "threshold": 0.2857142857142857,
+  "n_train": 3891,
+  "n_val": 835,
+  "n_test": 834,
+  "feature_importances": {
+    "tod_sin": 4962.208735034294,
+    "rolling_pos_rate_50": 4237.288280826941,
+    "tod_cos": 3036.415735038084,
+    "venue_bybit": 3017.367180383575,
+    "is_fwd": 2258.190952236823,
+    "venue_coinbase": 1158.3626939207315,
+    "venue_binance": 241.77455968875438,
+    "venue_kraken": 168.27621471334714,
+    "dow_sin": 0.0,
+    "dow_cos": 0.0
+  }
+}
