@@ -1,1 +1,47 @@
-~/Desktop/Claude/Project Omni-Arb v2/.gitignore
+# --- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments -------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# --- Local config / secrets -----------------------------------------------
+.env
+*.local
+
+# --- Operational logs (regenerated on every run) --------------------------
+scout.log
+emitter.log
+*.log
+
+# --- LaTeX build artefacts (keep .tex and .pdf, drop intermediates) -------
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.synctex.gz
+report/*.fls
+report/*.fdb_latexmk
+
+# --- IDE / OS junk --------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# --- Jupyter --------------------------------------------------------------
+.ipynb_checkpoints/
+
+# --- Don't ignore: trained models, reports, plots are part of the deliverable
+# (We intentionally commit models/*.joblib and reports/*.png so the
+# professor and teammates can inspect results without retraining.)
