@@ -35,6 +35,18 @@ log = structlog.get_logger(__name__)
 # Order matters only for logging; venues stream concurrently.
 SUPPORTED_VENUES: tuple[str, ...] = ("binance", "kraken", "coinbase", "bybit")
 
+# Each exchange accepts a different set of order-book depth values.
+#   Kraken accepts: 10, 25, 100, 500, 1000
+#   Bybit  accepts: 1, 50, 200, 1000  (spot markets)
+#   Binance / Coinbase are flexible.
+# We request more than 5 then slice to depth-5 in _persist().
+DEPTH_LIMIT_BY_VENUE: dict[str, int] = {
+    "binance":  10,
+    "kraken":   10,
+    "coinbase": 10,
+    "bybit":    50,
+}
+
 
 class Streamer:
     """Stream L2 depth-5 books for one venue, write each tick to Postgres."""
@@ -68,9 +80,10 @@ class Streamer:
 
     async def _stream_symbol(self, symbol: str) -> None:
         log.info("scout.subscribe", venue=self.venue, symbol=symbol)
+        depth_limit = DEPTH_LIMIT_BY_VENUE.get(self.venue, 10)
         while True:
             try:
-                book = await self.client.watch_order_book(symbol, limit=5)
+                book = await self.client.watch_order_book(symbol, limit=depth_limit)
                 await self._persist(symbol, book)
             except asyncio.CancelledError:
                 raise
@@ -120,15 +133,12 @@ async def run_all_venues(
 
 
 if __name__ == "__main__":
-    # 60-second smoke run; useful for local sanity check.
+    # Continuous run: streams all 4 venues forever until the process is killed.
     async def main() -> None:
         repo = BookSnapshotRepo.from_env()
-        await asyncio.wait_for(
-            run_all_venues(
-                symbols=("BTC/USDT", "ETH/USDT", "ETH/BTC"),
-                repo=repo,
-            ),
-            timeout=60.0,
+        await run_all_venues(
+            symbols=("BTC/USDT", "ETH/USDT", "ETH/BTC"),
+            repo=repo,
         )
 
     asyncio.run(main())

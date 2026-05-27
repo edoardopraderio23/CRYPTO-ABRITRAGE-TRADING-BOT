@@ -1,0 +1,89 @@
+{
+  "realistic_taker": [
+    {
+      "strategy": "Random",
+      "n_trades": 100,
+      "hit_rate": 0.0,
+      "total_pnl_usd": -773.0043744282485,
+      "avg_pnl_usd": -7.730043744282486,
+      "sharpe": -14.027292910507459,
+      "max_drawdown_usd": -769.8740389763034
+    },
+    {
+      "strategy": "Pre-fee Oracle",
+      "n_trades": 137,
+      "hit_rate": 0.0,
+      "total_pnl_usd": -567.1764315718649,
+      "avg_pnl_usd": -4.139973953079306,
+      "sharpe": -14.618446066817471,
+      "max_drawdown_usd": -564.4234647534093
+    },
+    {
+      "strategy": "Guardian",
+      "n_trades": 100,
+      "hit_rate": 0.0,
+      "total_pnl_usd": -485.59756902201667,
+      "avg_pnl_usd": -4.855975690220166,
+      "sharpe": -20.329347528550386,
+      "max_drawdown_usd": -477.62012179020155
+    }
+  ],
+  "maker_rebate": [
+    {
+      "strategy": "Random",
+      "n_trades": 100,
+      "hit_rate": 0.01,
+      "total_pnl_usd": -78.26554895776994,
+      "avg_pnl_usd": -0.7826554895776994,
+      "sharpe": -38.19665460641148,
+      "max_drawdown_usd": -77.53201391823362
+    },
+    {
+      "strategy": "Pre-fee Oracle",
+      "n_trades": 137,
+      "hit_rate": 0.0072992700729927005,
+      "total_pnl_usd": -68.03958852557568,
+      "avg_pnl_usd": -0.4966393323034721,
+      "sharpe": -57.0255010750752,
+      "max_drawdown_usd": -67.68432943703412
+    },
+    {
+      "strategy": "Guardian",
+      "n_trades": 100,
+      "hit_rate": 0.0,
+      "total_pnl_usd": -78.58846158762768,
+      "avg_pnl_usd": -0.7858846158762768,
+      "sharpe": -36.287664411951965,
+      "max_drawdown_usd": -77.78944126650569
+    }
+  ],
+  "frictionless": [
+    {
+      "strategy": "Random",
+      "n_trades": 100,
+      "hit_rate": 0.19,
+      "total_pnl_usd": -18.28851907474594,
+      "avg_pnl_usd": -0.18288519074745938,
+      "sharpe": -8.920159678575434,
+      "max_drawdown_usd": -18.154783818102764
+    },
+    {
+      "strategy": "Pre-fee Oracle",
+      "n_trades": 137,
+      "hit_rate": 1.0,
+      "total_pnl_usd": 14.15246234964207,
+      "avg_pnl_usd": 0.10330264488789832,
+      "sharpe": 11.854379788273057,
+      "max_drawdown_usd": 0.0
+    },
+    {
+      "strategy": "Guardian",
+      "n_trades": 100,
+      "hit_rate": 0.23,
+      "total_pnl_usd": -18.611625529706522,
+      "avg_pnl_usd": -0.18611625529706521,
+      "sharpe": -8.588630765048816,
+      "max_drawdown_usd": -18.412365684587034
+    }
+  ]
+}
