@@ -270,12 +270,84 @@ We acknowledge the following limitations:
 \end{itemize}
 
 % ---------------------------------------------------------------------------
+
+% ---------------------------------------------------------------------------
+\section*{Lessons learned}
+
+\paragraph{Technical lessons.}
+\begin{itemize}
+    \item \textbf{Schema-code alignment is not optional.} The single longest debugging
+          session of the project was caused by the \texttt{CycleRepo} writing to
+          columns that no longer existed in the actual database schema. Inserts
+          failed silently inside the emitter's broad \texttt{except} clause, producing
+          24 hours of zero cycles. Lesson: every repository class should have
+          an integration test that round-trips one row to the real schema.
+    \item \textbf{Silent failures are worse than loud failures.} A bare
+          \texttt{except Exception} that logs at \texttt{warning} level can mask a
+          full pipeline outage. Future work: replace blanket exception handlers
+          with specific catches, and surface failure rates as Prometheus metrics.
+    \item \textbf{Venue-specific quirks matter.} Kraken and Bybit reject default
+          depth-5 order book subscriptions; the published CCXT Pro docs do not
+          warn about this. Lesson: always probe each venue with the actual API
+          calls before assuming uniform behaviour.
+\end{itemize}
+
+\paragraph{Economic lessons.}
+\begin{itemize}
+    \item \textbf{Retail fees are the binding constraint.} Pre-fee mispricings
+          exist in 16.8\% of polls; realistic retail taker fees consume all of
+          them. The crypto-arbitrage trade at retail latency is structurally
+          unprofitable.
+    \item \textbf{Hit rate is not P\&L.} The Guardian beats Random selection by
+          +4 pp in hit rate but loses by the same amount in net P\&L. Trade
+          selection must account for the magnitude of wins versus losses, not
+          just their probability.
+    \item \textbf{Bybit is the most arbitrage-friendly major venue.} 41\,\% of its
+          observed triangles are pre-fee positive --- four times Binance, fifty
+          times Coinbase. Worth deeper study (microstructure? matching engine?).
+\end{itemize}
+
+\paragraph{Process lessons.}
+\begin{itemize}
+    \item \textbf{An agentic workflow saves real time, but governance is critical.}
+          Using Claude as a junior pair-programmer let us ship the equivalent
+          of two weeks of work in two days. The cost is that without
+          AGENTS.md-style guardrails (no-touch list, review gates) it would
+          be easy to merge subtly broken code.
+    \item \textbf{Plan for one-day data collection, not one-week.} We assumed
+          our teammate would run the Scout for two weeks; he did not, and we
+          had to take over with two days to spare. Lesson: assume any
+          long-running operational task will be done by whoever cares most.
+\end{itemize}
+
 \section{Conclusion}
 \label{sec:conclusion}
 
 We have presented Project Omni-Arb, an end-to-end crypto triangular arbitrage system spanning four exchanges, with an ML-gated decision pipeline (\emph{Triple-Gate}) trained and evaluated on over 9.5 million order-book snapshots and 5{,}560 candidate cycles. Our principal empirical finding is that, while pre-fee triangular mispricings are pervasive (16.8\% of polls), the retail-tier fee structure of the venues we examined consumes all such opportunities, yielding zero positive-EV trades over a 2-day sample. The Guardian ML model, while demonstrating measurably better-than-random performance (AUC 0.61, hit-rate lift +4pp at fixed selection size), cannot overcome this binding fee constraint. Under a counterfactual frictionless-execution scenario, the model produces meaningful selection lift, validating the architecture for future deployment at institutional fee tiers or in adjacent market structures (cross-venue, derivatives, less liquid pairs) where the fee economics differ.
 
 % ---------------------------------------------------------------------------
+
+% ---------------------------------------------------------------------------
+\section*{Use of generative AI}
+
+Generative AI assistants were used throughout this project as a coding and
+documentation collaborator. Specifically:
+
+\begin{itemize}
+    \item \textbf{Anthropic Claude (Opus 4.6, Sonnet 4.6)}: code drafting and
+          review, schema design, debugging the Scout streamer (venue depth
+          limits, repository schema alignment), drafting the cycle emitter
+          enumeration logic, drafting training and backtest scripts, and
+          drafting the structure of this report. All AI-assisted commits are
+          identifiable in the git history via the \texttt{[AI-AGENT-CONTRIBUTION]}
+          tag (see \texttt{AGENTS.md}).
+\end{itemize}
+
+All AI-generated code was reviewed and tested by the human authors before being
+merged. Per the course policy on foreign code, AI-assisted contributions are
+acknowledged here in full transparency but the design decisions, problem
+framing, and empirical interpretation are entirely our own.
+
 \section*{Acknowledgements}
 % [REPLACE with your acknowledgements -- e.g., teammates, advisor, etc.]
 The author thanks his teammates Andrea Cammarano and Giacomo Lanni for their contributions to the data infrastructure and brain modules respectively, and the course instructor at USI.
