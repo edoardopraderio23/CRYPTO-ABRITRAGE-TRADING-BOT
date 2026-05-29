@@ -41,9 +41,9 @@
     Architecture, Empirical Evidence, and Limits
 }
 \author{
-    Edoardo Praderio \\
+    Andrea Cammarano \quad Giacomo Lanni \quad Edoardo Praderio \\
     \small Università della Svizzera italiana --- Master in Finance \\
-    \small \texttt{edoardo.praderio23@gmail.com}
+    \small Corresponding author: \texttt{edoardo.praderio23@gmail.com}
 }
 \date{\today}
 
@@ -52,7 +52,7 @@
 
 % ---------------------------------------------------------------------------
 \begin{abstract}
-We design, implement, and empirically evaluate a triangular arbitrage system for crypto spot markets, spanning four major exchanges (Binance, Bybit, Coinbase, Kraken) and three currencies (USDT, BTC, ETH). The system is structured around a \emph{Triple-Gate} decision pipeline: (i) a Bellman--Ford profit gate that filters cycles by post-fee log-return, (ii) a LightGBM \emph{Guardian} ML model that scores cycles by their conditional probability of pre-fee profitability, and (iii) a Sentinel risk module that enforces inventory and drawdown constraints. Over 3.3 million order-book snapshots and 5{,}560 candidate cycles recorded across all four venues, we find that (a) pre-fee triangular mispricings are pervasive, occurring in 16.8\% of tick-level observations; (b) realistic retail taker fees of 10--60 basis points per leg consume all such opportunities, producing zero positive-EV trades in our 2-day sample; (c) the Guardian achieves an out-of-sample AUC of 0.61 and improves the hit rate of selected cycles by +4 percentage points over random selection (23.0\% vs.\ 19.0\%); and (d) under a frictionless-execution counterfactual, the methodology produces measurably better-than-random risk-adjusted returns, demonstrating the architecture is sound even though current market microstructure does not support a profitable production deployment at retail-fee tiers.
+We design, implement, and empirically evaluate a triangular arbitrage system for crypto spot markets, spanning four major exchanges (Binance, Bybit, Coinbase, Kraken) and three currencies (USDT, BTC, ETH). The system is structured around a \emph{Triple-Gate} decision pipeline: (i) a Bellman--Ford profit gate that filters cycles by post-fee log-return, (ii) a LightGBM \emph{Guardian} ML model that scores cycles by their conditional probability of pre-fee profitability, and (iii) a Sentinel risk module that enforces inventory and drawdown constraints. Over 9.6 million order-book snapshots and 5{,}560 candidate cycles recorded across all four venues, we find that (a) pre-fee triangular mispricings are pervasive, occurring in 16.8\% of tick-level observations; (b) realistic retail taker fees of 10--60 basis points per leg consume all such opportunities, producing zero positive-EV trades in our 2-day sample; (c) the Guardian achieves an out-of-sample AUC of 0.61 and improves the hit rate of selected cycles by +4 percentage points over random selection (23.0\% vs.\ 19.0\%); and (d) under a frictionless-execution counterfactual, the methodology produces measurably better-than-random risk-adjusted returns, demonstrating the architecture is sound even though current market microstructure does not support a profitable production deployment at retail-fee tiers.
 \end{abstract}
 
 % ---------------------------------------------------------------------------
@@ -323,7 +323,7 @@ We acknowledge the following limitations:
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have presented Project Omni-Arb, an end-to-end crypto triangular arbitrage system spanning four exchanges, with an ML-gated decision pipeline (\emph{Triple-Gate}) trained and evaluated on over 9.5 million order-book snapshots and 5{,}560 candidate cycles. Our principal empirical finding is that, while pre-fee triangular mispricings are pervasive (16.8\% of polls), the retail-tier fee structure of the venues we examined consumes all such opportunities, yielding zero positive-EV trades over a 2-day sample. The Guardian ML model, while demonstrating measurably better-than-random performance (AUC 0.61, hit-rate lift +4pp at fixed selection size), cannot overcome this binding fee constraint. Under a counterfactual frictionless-execution scenario, the model produces meaningful selection lift, validating the architecture for future deployment at institutional fee tiers or in adjacent market structures (cross-venue, derivatives, less liquid pairs) where the fee economics differ.
+We have presented Project Omni-Arb, an end-to-end crypto triangular arbitrage system spanning four exchanges, with an ML-gated decision pipeline (\emph{Triple-Gate}) trained and evaluated on over 9.6 million order-book snapshots and 5{,}560 candidate cycles. Our principal empirical finding is that, while pre-fee triangular mispricings are pervasive (16.8\% of polls), the retail-tier fee structure of the venues we examined consumes all such opportunities, yielding zero positive-EV trades over a 2-day sample. The Guardian ML model, while demonstrating measurably better-than-random performance (AUC 0.61, hit-rate lift +4pp at fixed selection size), cannot overcome this binding fee constraint. Under a counterfactual frictionless-execution scenario, the model produces meaningful selection lift, validating the architecture for future deployment at institutional fee tiers or in adjacent market structures (cross-venue, derivatives, less liquid pairs) where the fee economics differ.
 
 % ---------------------------------------------------------------------------
 
