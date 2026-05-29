@@ -4,8 +4,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[margin=2.5cm]{geometry}
+\usepackage[margin=2cm]{geometry}
 \usepackage{graphicx}
+% Look for figures both in the current folder (Overleaf) and in ../reports/ (local)
+\graphicspath{{./}{../reports/}}
 \usepackage{booktabs}
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref}
@@ -42,8 +44,7 @@
 }
 \author{
     Andrea Cammarano \quad Giacomo Lanni \quad Edoardo Praderio \\
-    \small Università della Svizzera italiana --- Master in Finance \\
-    \small Corresponding author: \texttt{edoardo.praderio23@gmail.com}
+    \small Università della Svizzera italiana --- Master in Finance
 }
 \date{\today}
 
@@ -69,7 +70,26 @@ We make four contributions:
     \item A three-scenario backtest (realistic, maker rebate, frictionless) that quantifies the fee elasticity of the strategy's expected value.
 \end{enumerate}
 
-The remainder of the paper is organised as follows. Section~\ref{sec:background} reviews triangular arbitrage and crypto market microstructure. Section~\ref{sec:architecture} describes the Triple-Gate architecture. Section~\ref{sec:data} reports data-collection methodology. Section~\ref{sec:methods} details the detection algorithm, feature engineering, and training procedure. Section~\ref{sec:results} presents results. Section~\ref{sec:discussion} interprets findings and discusses limitations. Section~\ref{sec:conclusion} concludes.
+The remainder of the paper is organised as follows. Section~\ref{sec:plan} states the project plan and Section~\ref{sec:diary} the project diary. Section~\ref{sec:background} reviews triangular arbitrage and crypto market microstructure. Section~\ref{sec:architecture} describes the Triple-Gate architecture. Section~\ref{sec:data} reports data-collection methodology. Section~\ref{sec:methods} details the detection algorithm, feature engineering, and training procedure. Section~\ref{sec:results} presents results. Section~\ref{sec:discussion} interprets findings and discusses limitations. Section~\ref{sec:conclusion} concludes.
+
+% ---------------------------------------------------------------------------
+\section{Project plan}
+\label{sec:plan}
+
+The project was scoped over a five-week window (April 21 -- May 28, 2026) with three authors assuming complementary roles: \textbf{Andrea Cammarano} (data infrastructure: Scout streamer, PostgreSQL schema, repository layer), \textbf{Giacomo Lanni} (quantitative core: Bellman--Ford detector, Profit Gate, property-based tests), and \textbf{Edoardo Praderio} (ML: Guardian features and training, backtest harness, academic report). Deliverables were defined upfront in \texttt{TECHNICAL\_PLAN.md} (committed April 25): a unified CCXT Pro streamer across four venues, a fee-aware cycle detector, a calibrated LightGBM classifier (Guardian), a three-scenario fee-elasticity backtest, and this academic report. The original plan called for two weeks of continuous data collection; in practice we accelerated to 23 hours of streaming with the ML and backtest phases compressed into the final week. Tooling decisions taken at planning time: Python 3.13, PostgreSQL 16, LightGBM for the production model with Random Forest as interpretable baseline, isotonic regression for probability calibration, and \texttt{hypothesis} for property-based testing of the Brain.
+
+% ---------------------------------------------------------------------------
+\section{Project diary}
+\label{sec:diary}
+
+\begin{itemize}[leftmargin=*, itemsep=0pt]
+    \item \textbf{April 21--27.} Scoping and architecture. Decided on triangular arbitrage as the topic. Drafted \texttt{AGENTS.md} (agentic-project governance) and the Triple-Gate decomposition. Tool: Anthropic Claude for design brainstorming.
+    \item \textbf{April 28 -- May 4.} Data infrastructure. Andrea built the Scout streamer (CCXT Pro) and the initial PostgreSQL schema; first end-to-end smoke test on Binance. Tools: CCXT Pro, psycopg2.
+    \item \textbf{May 5--11.} Brain modules. Giacomo wrote the Bellman--Ford detector (\texttt{cycles.py}) and Profit Gate (\texttt{profit\_gate.py}) with property-based tests via \texttt{hypothesis}. Decision recorded in Issue \#1: add Bybit as the 4th venue to broaden the opportunity surface.
+    \item \textbf{May 12--18.} ML training pipeline. Edoardo implemented Guardian feature engineering and training. Mid-week pivot from a replay-based label to \texttt{raw\_log\_return > 0} after the test window proved insufficient at retail-fee thresholds. Tools: scikit-learn, LightGBM.
+    \item \textbf{May 19--27.} Backtest, debugging, report. Rewrote the cycle emitter to enumerate all triangles (the original Bellman-Ford-only version returned zero training data in efficient markets). Ran the three-scenario backtest and discovered the empirical efficient-markets finding. Drafted the LaTeX report. Tools: Claude for backtest design and report drafting; Overleaf for LaTeX compilation.
+    \item \textbf{May 28--29.} Documentation polish: AI acknowledgements, project diary, user guide, lessons learned. Tagged \texttt{v0.2.0} release on GitHub; submitted on iCorsi.
+\end{itemize}
 
 % ---------------------------------------------------------------------------
 \section{Background}
@@ -94,7 +114,7 @@ Crypto exchanges charge per-leg taker fees ranging from approximately $\phi = 10
 \section{System Architecture}
 \label{sec:architecture}
 
-The system implements a five-component pipeline. Figure~\ref{fig:architecture} (omitted in this draft) presents the dataflow diagram.
+The system implements a five-component pipeline. The dataflow is illustrated in the Triple-Gate paragraphs that follow.
 
 \paragraph{Scout.} A unified CCXT Pro WebSocket streamer subscribes simultaneously to depth-10 (Kraken) and depth-50 (Bybit spot) order books for BTC/USDT, ETH/USDT, and ETH/BTC across all four venues. Each tick is persisted via psycopg2 to a \texttt{book\_snapshots} Postgres table, with offload to a worker thread so the WebSocket loop is never blocked on database I/O.
 
@@ -196,7 +216,7 @@ Training on the first 70\,\% of cycles, validating on the next 15\,\%, and testi
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\linewidth]{../reports/guardian_pr_curve.png}
+\includegraphics[width=0.7\linewidth]{guardian_pr_curve.png}
 \caption{Guardian precision-recall curve on the held-out test set. The orange line is the model; the dashed grey line is the random baseline at the 16.4\% positive class rate.}
 \label{fig:pr}
 \end{figure}
@@ -231,14 +251,14 @@ Frictionless    & Random         & 100 & 0.190 & $-18$  & $-8.9$ \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.9\linewidth]{../reports/equity_curves.png}
+\includegraphics[width=0.9\linewidth]{equity_curves.png}
 \caption{Cumulative gross P\&L per strategy under the frictionless scenario (methodology demonstration).}
 \label{fig:equity}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\linewidth]{../reports/strategy_comparison.png}
+\includegraphics[width=\linewidth]{strategy_comparison.png}
 \caption{Strategy comparison across all three fee scenarios. Net P\&L in USD.}
 \label{fig:comparison}
 \end{figure}
